@@ -1,0 +1,7 @@
+variables:
+  root_catalog:
+    description: "The catalog to use for the root schema."
+    default: main
+  root_schema:
+    description: "The schema to use for the root schema."
+    default: default

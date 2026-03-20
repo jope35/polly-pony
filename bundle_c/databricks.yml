@@ -1,0 +1,15 @@
+bundle:
+  name: bundle_c
+  uuid: ce976f37-d483-491a-8331-033a46492520
+
+artifacts:
+  platform:
+    dynamic_version: true
+    type: whl
+    path: .
+    build: uv lock && uv sync && uv build
+  utils:
+    dynamic_version: true
+    type: whl
+    path: ..
+    build: uv lock && uv sync && uv build
