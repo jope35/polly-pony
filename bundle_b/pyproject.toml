@@ -3,11 +3,8 @@ name = "bundle-b"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "pandas>=3.0.1",
-    "polly-pony-utils",
-]
+requires-python = ">=3.12"
+dependencies = ["pandas>=3.0.1", "polly-pony-utils"]
 
 [tool.uv.sources]
 polly-pony-utils = { path = "..", editable = true }
