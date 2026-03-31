@@ -2,6 +2,10 @@ version = 1
 revision = 3
 requires-python = "==3.12.3"
 
+[options]
+exclude-newer = "2026-03-24T20:53:41.250163Z"
+exclude-newer-span = "P7D"
+
 [[package]]
 name = "bundle-b"
 version = "0.1.0"

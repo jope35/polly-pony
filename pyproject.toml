@@ -12,3 +12,12 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.sdist]
 only-include = ["src/polly_pony_utils"]
+
+[tool.uv]
+exclude-newer = "7 days"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=3,<5",
+    "ruff>=0.15.7",
+]

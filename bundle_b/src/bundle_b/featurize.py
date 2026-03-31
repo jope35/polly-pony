@@ -26,7 +26,9 @@ def hash_featurize(
         DataFrame with ``num_features`` additional integer columns appended.
     """
     hash_bucket = F.abs(F.hash(F.col(input_col))) % F.lit(num_features)
-    return df.withColumns({
-        f"{output_prefix}_{i}": F.when(hash_bucket == i, 1).otherwise(0)
-        for i in range(num_features)
-    })
+    return df.withColumns(
+        {
+            f"{output_prefix}_{i}": F.when(hash_bucket == i, 1).otherwise(0)
+            for i in range(num_features)
+        }
+    )

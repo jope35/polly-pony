@@ -14,5 +14,8 @@ only-include = ["src/bundle_b"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/bundle_b"]
 
+[tool.uv]
+exclude-newer = "7 days"
+
 [tool.uv.sources]
 polly-pony-utils = { path = "..", editable = true }

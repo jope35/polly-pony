@@ -1,9 +1,8 @@
 """Silver layer: cleaned and feature-engineered taxi trip data."""
 
+from bundle_b.featurize import hash_featurize
 from pyspark import pipelines as dp
 from pyspark.sql import functions as F
-
-from bundle_b.featurize import hash_featurize
 
 
 @dp.table(

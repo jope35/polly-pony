@@ -3,8 +3,8 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://dbc-b9d925fd-a82e.cloud.databricks.com
+      host: <<FILL IN YOUR HOST>>
   prod:
     mode: production
     workspace:
-      host: https://dbc-b9d925fd-a82e.cloud.databricks.com
+      host: <<FILL IN YOUR HOST>>
