@@ -12,9 +12,9 @@ artifacts:
     dynamic_version: true
     type: whl
     path: .
-    build: uv lock && uv sync && uv build
+    build: uv lock && uv build
   utils:
     dynamic_version: true
     type: whl
     path: ..
-    build: uv lock && uv sync && uv build
+    build: uv lock && uv build
