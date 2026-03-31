@@ -19,18 +19,18 @@
 </p>
 <br />
 
-# 👋 Welcome
+# Welcome
 
 Polly-Pony is a (lightly) opinionated setup for deploying Databricks resources through multiple independent Declarative Automation Bundles.
 This repository demonstrates how to split one large deployment into smaller, isolated bundle units that can be validated and deployed in parallel.
 
 # Highlights
 
-- 🗂️ **Multi-bundle layout**: each bundle component has its own `databricks.yml`, leading to a clean and modular deployment structure.
-- 🛠️ **Shared code package**: common utilities are published from the root package.
-- 🛞🛞 **Two-wheel artifact pattern** per bundle: each deployment builds both a bundle wheel and the shared utils wheel.
-- 🚀 **Parallel deployment workflow** across all discovered bundles.
-- 🐍 **Consistent Python baseline** across root and bundle projects.
+- **Multi-bundle layout**: each bundle component has its own `databricks.yml`, leading to a clean and modular deployment structure.
+- **Shared code package**: common utilities are published from the root package.
+- **Two-wheel artifact pattern** per bundle: each deployment builds both a bundle wheel and the shared utils wheel.
+- **Parallel deployment workflow** across all discovered bundles.
+- **Consistent Python baseline** across root and bundle projects (Python 3.12.3, Databricks Runtime 17.3 LTS).
 
 # Repository Structure
 
@@ -42,25 +42,21 @@ This repository demonstrates how to split one large deployment into smaller, iso
 ├── bundle/                         # Root configuration for bundle variables and targets
 │    ├── targets.yml                # deploy targets (e.g., dev, prod, etc.)
 │    └── variables.yml              # global variables for bundle deployments
-├── bundle_a/                       # independent bundle
+├── bundle_a/                       # independent bundle: seaborn visualization job
 │   ├── databricks.yml              # deployment configuration
 │   ├── pyproject.toml              # Python project config
-│   └── main.py
-├── bundle_b/
-│   ├── databricks.yml
-│   ├── pyproject.toml
-│   └── main.py
-└── bundle_c/
-    ├── databricks.yml
-    ├── pyproject.toml
-    └── main.py
+│   └── src/                        # bundle source code
+└── bundle_b/                       # independent bundle: SDP medallion pipeline
+    ├── databricks.yml              # deployment configuration
+    ├── pyproject.toml              # Python project config
+    └── src/                        # bundle source code
 ```
 
 # Why Split a Bundle?
 
 Databricks Asset Bundles use Terraform state under the hood. Splitting resources into multiple bundles reduces coupling and enables separate deployment lanes.
 
-In this repo, each bundle is a standalone deployment unit:`bundle_a`, `bundle_b`, `bundle_c`
+In this repo, each bundle is a standalone deployment unit: `bundle_a` and `bundle_b`.
 Each has:
 
 - its own `databricks.yml`
@@ -99,7 +95,7 @@ Each bundle runs in parallel, with prefixed output and a final success/failure s
 ```bash
 # Validate and deploy bundle_a
 cd bundle_a
-databricks bundle validate$$
+databricks bundle validate
 databricks bundle deploy
 ```
 
@@ -122,7 +118,7 @@ Every bundle defines two artifacts in its `databricks.yml`:
 Both are configured as `type: whl` and built with:
 
 ```bash
-uv lock && uv sync && uv build # ensure dependencies are algined with the pyproject.toml
+uv lock && uv build # ensure dependencies are aligned with the pyproject.toml
 ```
 
 This keeps shared code reusable while preserving independent bundle deployment units.
