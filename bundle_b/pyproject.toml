@@ -1,8 +1,8 @@
 [project]
 name = "bundle-b"
-version = "2024.06.0"
+version = "0.1.0"
 description = "SDP pipeline with medallion architecture"
-requires-python = ">=3.12"
+requires-python = "==3.12.3"
 
 [build-system]
 requires = ["hatchling"]
