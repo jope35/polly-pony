@@ -1,4 +1,5 @@
-from bundle_a import main
+from bundle_a import plot
 
-if __name__ == "__main__":
-    main()
+df_in = spark.table("samples.nyctaxi.trips").select("trip_distance").limit(100)
+
+plot(df_in)

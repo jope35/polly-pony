@@ -1,7 +1,7 @@
 variables:
   root_catalog:
     description: "The catalog to use for the root schema."
-    default: jdetheije
+    default: workspace
   root_schema:
     description: "The schema to use for the root schema."
     default: default

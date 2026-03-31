@@ -10,7 +10,7 @@ resources:
       environments:
         - environment_key: default
           spec:
-            environment_version: "2"
+            environment_version: "5"
             dependencies:
               - ../../dist/*.whl
               - ../dist/*.whl

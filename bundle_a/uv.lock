@@ -12,15 +12,11 @@ name = "bundle-a"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "polly-pony-utils" },
     { name = "seaborn" },
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "polly-pony-utils", editable = "../" },
-    { name = "seaborn", specifier = ">=0.13.2" },
-]
+requires-dist = [{ name = "seaborn", specifier = ">=0.13.2" }]
 
 [[package]]
 name = "contourpy"
@@ -190,11 +186,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/3d/17/688626d192d7261bbbf98846fc98995726bddc2c945344b65bec3a29d731/pillow-12.1.1-cp312-cp312-win_amd64.whl", hash = "sha256:21329ec8c96c6e979cd0dfd29406c40c1d52521a90544463057d2aaa937d66a6", size = 7033367, upload-time = "2026-02-11T04:21:03.536Z" },
     { url = "https://files.pythonhosted.org/packages/ed/fe/a0ef1f73f939b0eca03ee2c108d0043a87468664770612602c63266a43c4/pillow-12.1.1-cp312-cp312-win_arm64.whl", hash = "sha256:af9a332e572978f0218686636610555ae3defd1633597be015ed50289a03c523", size = 2453811, upload-time = "2026-02-11T04:21:05.116Z" },
 ]
-
-[[package]]
-name = "polly-pony-utils"
-version = "0.1.0"
-source = { editable = "../" }
 
 [[package]]
 name = "pyparsing"
