@@ -1,89 +1,157 @@
-# polly-pony
+<br />
+<h1 style="font-size: 6em;"><p align="center">🐎🐎🐎 Polly-Pony 🐎🐎🐎</p></h1>
+<h2><p align="center">Supercharge your Databricks bundle deployments</p></h2>
+<h3><p align="center">A lightweight pattern for splitting and deploying independent Databricks bundles</p></h3>
 
-## Why split a bundle?
+<p align="center">
+  <a href="https://www.python.org/">
+    <img alt="Python >=3.12" src="https://img.shields.io/badge/Python-%3E%3D3.12-blue.svg" />
+  </a>
+  <a href="https://github.com/astral-sh/uv">
+    <img alt="uv" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" />
+  </a>
+  <a href="https://docs.databricks.com/en/dev-tools/bundles/index.html">
+    <img alt="Declarative Automation Bundles" src="https://img.shields.io/badge/Declarative%20Automation-Bundles-ff3621.svg" />
+  </a>
+  <a href="https://github.com/revodatanl/polly-pony/commits/main">
+    <img alt="GitHub last commit (branch)" src="https://img.shields.io/github/last-commit/revodatanl/polly-pony/main" />
+  </a>
+</p>
+<br />
 
-Databricks Asset Bundles use Terraform under the hood. By default, all resources live in a single state file — one `databricks.yml`, one deployment, one lock. This works fine for small projects, but as the number of pipelines, jobs, and artifacts grows, a single bundle becomes a bottleneck:
+# 👋 Welcome
 
-- **Slow deployments** — Terraform must plan and apply every resource, even if you only changed one pipeline. The more resources in the state, the longer each deploy takes.
-- **Merge conflicts on the lock** — only one `databricks bundle deploy` can run at a time per bundle, if you dont use a technique to separate the work. When multiple team members deploy concurrently, one blocks the other.
-- **Blast radius** — a bad change to one pipeline can stall the deployment of everything else in the same bundle.
+Polly-Pony is a (lightly) opinionated setup for deploying Databricks resources through multiple independent Declarative Automation Bundles.
+This repository demonstrates how to split one large deployment into smaller, isolated bundle units that can be validated and deployed in parallel.
 
-This repository demonstrates how to split a single Databricks Asset Bundle into multiple independent bundles (`bundle_a`, `bundle_b`, `bundle_c`), each with its own `databricks.yml`, its own Terraform state, and its own wheel. Because each bundle is a standalone deployment unit:
+# Highlights
 
-- **Deployments are faster** — each bundle only plans and applies its own resources.
-- **Teams don't block each other** — two people can deploy different bundles at the same time, since each bundle holds its own state lock.
-- **Failures are isolated** — a broken deploy in `bundle_a` has no effect on `bundle_b` or `bundle_c`.
+- 🗂️ **Multi-bundle layout**: each bundle component has its own `databricks.yml`, leading to a clean and modular deployment structure.
+- 🛠️ **Shared code package**: common utilities are published from the root package.
+- 🛞🛞 **Two-wheel artifact pattern** per bundle: each deployment builds both a bundle wheel and the shared utils wheel.
+- 🚀 **Parallel deployment workflow** across all discovered bundles.
+- 🐍 **Consistent Python baseline** across root and bundle projects.
 
-Shared Python code lives in `polly-pony-utils` at the repository root. Each bundle declares it as a dependency and ships it as a second wheel artifact, so common logic is reused without coupling the deployments together.
+# Repository Structure
 
-## Deployment
+```text
+.
+├── run-databricks-bundles.sh       # deployment script for all bundles
+├── pyproject.toml                  # Python project config for the shared polly-pony-utils package
+├── src/polly_pony_utils/           # Source code for the shared utility package
+├── bundle/                         # Root configuration for bundle variables and targets
+│    ├── targets.yml                # deploy targets (e.g., dev, prod, etc.)
+│    └── variables.yml              # global variables for bundle deployments
+├── bundle_a/                       # independent bundle
+│   ├── databricks.yml              # deployment configuration
+│   ├── pyproject.toml              # Python project config
+│   └── main.py
+├── bundle_b/
+│   ├── databricks.yml
+│   ├── pyproject.toml
+│   └── main.py
+└── bundle_c/
+    ├── databricks.yml
+    ├── pyproject.toml
+    └── main.py
+```
 
-All bundles are deployed in parallel using `deploy.sh`. The script auto-discovers every directory containing a `databricks.yml` and runs `databricks bundle validate` + `databricks bundle deploy` in each.
+# Why Split a Bundle?
+
+Databricks Asset Bundles use Terraform state under the hood. Splitting resources into multiple bundles reduces coupling and enables separate deployment lanes.
+
+In this repo, each bundle is a standalone deployment unit:`bundle_a`, `bundle_b`, `bundle_c`
+Each has:
+
+- its own `databricks.yml`
+- its own artifact build definitions
+- its own deployment lifecycle
+
+This setup makes it practical to validate/deploy bundle changes independently instead of routing everything through one large state.
+
+# How Deployments Work
+
+`run-databricks-bundles.sh` auto-discovers directories containing `databricks.yml` (within repo depth), then runs:
+
+1. `databricks bundle validate`
+2. `databricks bundle deploy` (unless `--validate-only` is set)
+
+Each bundle runs in parallel, with prefixed output and a final success/failure summary.
+
+## Script usage
 
 ```bash
 # Deploy all bundles to the default target
-./deploy.sh
+./run-databricks-bundles.sh
 
 # Deploy all bundles to a specific target
-./deploy.sh --target prod
+./run-databricks-bundles.sh --target prod
 
 # Validate only (no deploy)
-./deploy.sh --validate-only
+./run-databricks-bundles.sh --validate-only
 
 # Show help
-./deploy.sh --help
+./run-databricks-bundles.sh --help
 ```
 
-Each bundle produces two wheel artifacts during deployment:
-
-- Its own wheel (e.g. `bundle_a-0.1.0-py3-none-any.whl`)
-- The shared `polly_pony_utils-0.1.0-py3-none-any.whl`
-
-Both wheels are built and uploaded automatically by `databricks bundle deploy`.
-
-To deploy a single bundle manually:
+## Deploy a single bundle manually
 
 ```bash
+# Validate and deploy bundle_a
 cd bundle_a
-databricks bundle deploy            # default target
-databricks bundle deploy -t prod    # specific target
+databricks bundle validate$$
+databricks bundle deploy
 ```
 
-## Dependency Management
+# Configuration Files
 
-Each bundle (`bundle_a`, `bundle_b`, `bundle_c`) is deployed with two wheels: its own wheel and the shared `polly-pony-utils` wheel. Both are installed in the same Python environment on the cluster, so dependency versions must be compatible.
+Shared bundle config examples live under `bundle/`:
 
-### Decision Tree: Where to Declare a Dependency
+- `bundle/targets.yml` defines `dev` (default) and `prod` targets.
+- `bundle/variables.yml` defines `root_catalog` and `root_schema` defaults.
+
+These files document target/variable conventions used in this repository.
+
+# Artifact Pattern
+
+Every bundle defines two artifacts in its `databricks.yml`:
+
+- `platform`: the bundle-local wheel from `path: .`
+- `utils`: the shared wheel from `path: ..` (the root `polly-pony-utils` package)
+
+Both are configured as `type: whl` and built with:
+
+```bash
+uv lock && uv sync && uv build # ensure dependencies are algined with the pyproject.toml
+```
+
+This keeps shared code reusable while preserving independent bundle deployment units.
+
+# Dependency Management
+
+Each bundle depends on `polly-pony-utils` via local editable source mapping in the bundle's `pyproject.toml`:
+
+```toml
+[tool.uv.sources]
+polly-pony-utils = { path = "..", editable = true }
+```
+
+## Decision tree: where to declare a dependency
 
 ```text
 Do I need a new Python package?
 │
 ├─ YES: Is it used by polly-pony-utils?
 │       │
-│       ├─ YES: Declare it in polly-pony-utils/pyproject.toml
-│       │       └─ Does a bundle also use it directly?
-│       │               │
-│       │               ├─ YES: Do NOT add it to the bundle.
-│       │               │       It comes in transitively via polly-pony-utils.
-│       │               │
-│       │               └─ NO:  Nothing to do.
+│       ├─ YES: Declare it in root pyproject.toml (polly-pony-utils)
+│       │       and let bundles receive it transitively.
 │       │
-│       └─ NO:  Is it used by only one bundle?
+│       └─ NO: Is it bundle-specific?
 │               │
-│               ├─ YES: Declare it in that bundle's pyproject.toml only.
+│               ├─ YES: Declare it in that bundle's pyproject.toml.
 │               │
-│               └─ NO:  Used by multiple bundles?
-│                       │
-│                       └─ YES: Consider moving it to polly-pony-utils.
-│                               If that doesn't make sense, declare the
-│                               same version range in each bundle.
+│               └─ NO: If several bundles need it, keep version
+│                       ranges aligned across those bundles.
 │
-└─ NO:  Nothing to do.
+└─ NO: Nothing to do.
 ```
-
-### Rules
-
-1. **Shared deps live in `polly-pony-utils`** — if `polly-pony-utils` needs a package, that's the single source of truth for the version range. Bundles get it transitively.
-2. **Never duplicate a dependency** — if a package is already declared in `polly-pony-utils`, do not also declare it in a bundle. Conflicting version pins will cause pip to fail at cluster startup.
-3. **Bundle-only deps stay in the bundle** — packages that only one bundle needs belong in that bundle's `pyproject.toml`.
-4. **Multi-bundle deps without utils usage** — if multiple bundles need the same package but `polly-pony-utils` doesn't, prefer adding it to `polly-pony-utils` anyway to centralize the version pin. If that's not appropriate, use identical version ranges across bundles.

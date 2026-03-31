@@ -2,6 +2,12 @@ bundle:
   name: bundle_a
   uuid: 4cb4298a-f11e-4c04-9aa7-79428719897c
 
+include:
+  - ../bundle/targets.yml
+  - ../bundle/variables.yml
+  - resources/*.yml
+
+
 artifacts:
   platform:
     dynamic_version: true

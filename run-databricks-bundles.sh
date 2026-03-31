@@ -4,6 +4,7 @@ set -uo pipefail
 # Resolve script location so it works regardless of where it's called from
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VALIDATE_ONLY=false
+DESTROY_ONLY=false
 TARGET=""
 
 # Distinct colors so parallel output from different bundles is easy to tell apart
@@ -14,11 +15,12 @@ usage() {
     echo "Usage: $(basename "$0") [OPTIONS]"
     echo ""
     echo "Discover all Databricks bundles (directories with databricks.yml)"
-    echo "and run validate + deploy in each, in parallel."
+    echo "and run validate+deploy (or destroy) in each, in parallel."
     echo ""
     echo "Options:"
     echo "  -t, --target TARGET   Deploy to a specific target (e.g. dev, prod)"
     echo "  -v, --validate-only   Only run 'databricks bundle validate', skip deploy"
+    echo "  -d, --destroy-only    Only run 'databricks bundle destroy --auto-approve' (permanent delete), skip validate/deploy"
     echo "  -h, --help            Show this help message"
 }
 
@@ -32,6 +34,10 @@ while [[ $# -gt 0 ]]; do
             VALIDATE_ONLY=true
             shift
             ;;
+        -d|--destroy-only)
+            DESTROY_ONLY=true
+            shift
+            ;;
         -h|--help)
             usage
             exit 0
@@ -43,6 +49,12 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [[ "$VALIDATE_ONLY" == true && "$DESTROY_ONLY" == true ]]; then
+    echo "Error: --validate-only and --destroy-only are mutually exclusive."
+    usage
+    exit 1
+fi
 
 # Find all bundle directories so we know what to validate/deploy
 bundle_dirs=()
@@ -65,7 +77,9 @@ echo "========================================"
 
 echo "Target: ${TARGET:-(default)}"
 
-if $VALIDATE_ONLY; then
+if $DESTROY_ONLY; then
+    echo "Mode: destroy only"
+elif $VALIDATE_ONLY; then
     echo "Mode: validate only"
 else
     echo "Mode: validate + deploy"
@@ -84,20 +98,29 @@ for dir in "${bundle_dirs[@]}"; do
     (
         cd "$dir"
         prefix="${color}[$name]${RESET}"
-        echo -e "$prefix Starting validation..."
-        if ! databricks bundle validate ${TARGET:+-t "$TARGET"} 2>&1 | while IFS= read -r line; do echo -e "$prefix $line"; done; then
-            echo -e "$prefix Validation FAILED"
-            exit 1
-        fi
-        echo -e "$prefix Validation succeeded"
-
-        if ! $VALIDATE_ONLY; then
-            echo -e "$prefix Starting deployment..."
-            if ! databricks bundle deploy ${TARGET:+-t "$TARGET"} 2>&1 | while IFS= read -r line; do echo -e "$prefix $line"; done; then
-                echo -e "$prefix Deployment FAILED"
+        if $DESTROY_ONLY; then
+            echo -e "$prefix Starting destroy..."
+            if ! databricks bundle destroy --auto-approve ${TARGET:+-t "$TARGET"} 2>&1 | while IFS= read -r line; do echo -e "$prefix $line"; done; then
+                echo -e "$prefix Destroy FAILED"
                 exit 1
             fi
-            echo -e "$prefix Deployment succeeded"
+            echo -e "$prefix Destroy succeeded"
+        else
+            echo -e "$prefix Starting validation..."
+            if ! databricks bundle validate ${TARGET:+-t "$TARGET"} 2>&1 | while IFS= read -r line; do echo -e "$prefix $line"; done; then
+                echo -e "$prefix Validation FAILED"
+                exit 1
+            fi
+            echo -e "$prefix Validation succeeded"
+
+            if ! $VALIDATE_ONLY; then
+                echo -e "$prefix Starting deployment..."
+                if ! databricks bundle deploy ${TARGET:+-t "$TARGET"} 2>&1 | while IFS= read -r line; do echo -e "$prefix $line"; done; then
+                    echo -e "$prefix Deployment FAILED"
+                    exit 1
+                fi
+                echo -e "$prefix Deployment succeeded"
+            fi
         fi
     ) &
     pids+=($!)
