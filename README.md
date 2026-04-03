@@ -61,10 +61,10 @@ Each bundle is its own deployable unit (`bundle_a`, `bundle_b` here) with a dedi
 
 Before you deploy, adjust shared bundle inputs to match **your** workspace and catalog defaults.
 
-| File | Role |
-|------|------|
-| [`bundle/targets.yml`](bundle/targets.yml) | Named targets (for example `dev`, `prod`) and `workspace.host` per target. **Replace the example hosts** with your Databricks workspace URL. |
-| [`bundle/variables.yml`](bundle/variables.yml) | Bundle variables such as `root_catalog` and `root_schema`. |
+| File                                           | Role                                                                                                                                         |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`bundle/targets.yml`](bundle/targets.yml)     | Named targets (for example `dev`, `prod`) and `workspace.host` per target. **Replace the example hosts** with your Databricks workspace URL. |
+| [`bundle/variables.yml`](bundle/variables.yml) | Bundle variables such as `root_catalog` and `root_schema`.                                                                                   |
 
 Each bundle’s `databricks.yml` **includes** these files so targets and variables stay consistent across bundles.
 
@@ -110,11 +110,11 @@ databricks bundle deploy
 
 For each bundle directory it:
 
-| Mode | Script flags | Per bundle |
-|------|----------------|------------|
-| Validate only | `--validate-only` | `databricks bundle validate` |
-| Validate + deploy | *(default)* | `databricks bundle validate` then `databricks bundle deploy` |
-| Destroy only | `--destroy-only` | `databricks bundle destroy --auto-approve` |
+| Mode              | Script flags      | Per bundle                                                   |
+| ----------------- | ----------------- | ------------------------------------------------------------ |
+| Validate only     | `--validate-only` | `databricks bundle validate`                                 |
+| Validate + deploy | *(default)*       | `databricks bundle validate` then `databricks bundle deploy` |
+| Destroy only      | `--destroy-only`  | `databricks bundle destroy --auto-approve`                   |
 
 When a `--target` / `-t` is passed to the script, it is forwarded to the Databricks CLI as `-t` for each command.
 
@@ -165,10 +165,10 @@ Databricks documents bundle concepts and workflow in the **[Bundles developer gu
 
 Every bundle defines **two** wheel artifacts in its `databricks.yml`:
 
-| Artifact | `path` | Built as | Meaning |
-|----------|--------|----------|---------|
+| Artifact   | `path`                 | Built as              | Meaning                                |
+| ---------- | ---------------------- | --------------------- | -------------------------------------- |
 | `platform` | `.` (bundle directory) | `uv lock && uv build` | Wheel for that bundle’s Python package |
-| `utils` | `..` (repo root) | `uv lock && uv build` | Wheel for `polly-pony-utils` |
+| `utils`    | `..` (repo root)       | `uv lock && uv build` | Wheel for `polly-pony-utils`           |
 
 Because `utils` uses `path: ..`, its build command runs with the **repo root** as the build context for that artifact; `platform` builds **inside the bundle directory**. Bundle deploys expect the resulting wheels under each project’s `dist/` (and your job/pipeline configs reference those globs).
 
