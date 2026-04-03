@@ -1,0 +1,10 @@
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: <<FILL IN YOUR HOST>>
+  prod:
+    mode: production
+    workspace:
+      host: <<FILL IN YOUR HOST>>

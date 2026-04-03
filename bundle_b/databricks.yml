@@ -1,0 +1,20 @@
+bundle:
+  name: bundle_b
+  uuid: 31c6b2d6-454c-43e5-9cdf-0fd6b83e3373
+
+include:
+  - ../bundle/targets.yml
+  - ../bundle/variables.yml
+  - resources/*.yml
+
+artifacts:
+  platform:
+    dynamic_version: true
+    type: whl
+    path: .
+    build: uv lock && uv build
+  utils:
+    dynamic_version: true
+    type: whl
+    path: ..
+    build: uv lock && uv build

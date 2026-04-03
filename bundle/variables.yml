@@ -1,0 +1,7 @@
+variables:
+  root_catalog:
+    description: "Unity Catalog catalog name for bundle resources."
+    default: workspace
+  root_schema:
+    description: "Unity Catalog schema name for bundle resources."
+    default: default

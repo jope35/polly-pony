@@ -1,0 +1,20 @@
+resources:
+  pipelines:
+    pipeline_b:
+      name: ${bundle.name}-dlt-pipeline
+      catalog: ${var.root_catalog}
+      schema: ${var.root_schema}
+      libraries:
+        - file:
+            path: ../src/bronze.sql
+        - file:
+            path: ../src/silver.py
+        - file:
+            path: ../src/gold.sql
+      environment:
+        dependencies:
+          - ../dist/*.whl
+          - ../../dist/*.whl
+      serverless: true
+      development: true
+      continuous: false

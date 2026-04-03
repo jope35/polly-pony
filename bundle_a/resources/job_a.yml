@@ -1,0 +1,16 @@
+resources:
+  jobs:
+    job_a:
+      name: ${bundle.name}-job-a
+      tasks:
+        - task_key: seaborn_task
+          spark_python_task:
+            python_file: ../src/main.py
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            environment_version: "5"
+            dependencies:
+              - ../../dist/*.whl
+              - ../dist/*.whl
