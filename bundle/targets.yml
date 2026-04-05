@@ -4,7 +4,13 @@ targets:
     default: true
     workspace:
       host: <<FILL IN YOUR HOST>>
+    artifacts:
+      platform:
+        dynamic_version: true
+      utils:
+        dynamic_version: true
   prod:
     mode: production
     workspace:
       host: <<FILL IN YOUR HOST>>
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
