@@ -9,12 +9,10 @@ include:
 
 artifacts:
   platform:
-    dynamic_version: true
     type: whl
     path: .
     build: uv lock && uv build
   utils:
-    dynamic_version: true
     type: whl
     path: ..
     build: uv lock && uv build
