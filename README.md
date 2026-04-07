@@ -21,27 +21,27 @@
 
 # What is Polly-Pony?
 
-Polly-Pony is a small, opinionated example of deploying Databricks resources through **multiple independent [Databricks Asset Bundles](https://docs.databricks.com/en/dev-tools/bundles/index.html)** (also called Declarative Automation Bundles).
+Polly-Pony is a small, opinionated example of deploying Databricks resources through **multiple independent [Databricks Asset Bundles](https://docs.databricks.com/en/dev-tools/bundles/index.html)** (formerly known as Declarative Automation Bundles).
 
 Each bundle is its own deployable unit (`bundle_a`, `bundle_b` here) with a dedicated `databricks.yml`, artifact builds, and lifecycle. A root script discovers those bundles and can **validate**, **deploy**, or **destroy** them **in parallel**.
 
 # Highlights
 
-- **Multi-bundle layout**: one `databricks.yml` per bundle; shared targets and variables under `bundle/`.
-- **Shared Python package**: `polly-pony-utils` at the repo root (`src/polly_pony_utils`).
-- **Two-wheel artifact pattern** per bundle: a **platform** wheel (bundle code) plus a **utils** wheel (shared package).
-- **Parallel workflow**: `run-databricks-bundles.sh` runs each bundle concurrently with prefixed logs.
-- **Pinned Python**: root and bundle projects use **Python 3.12.3** in their `pyproject.toml` files.
+- 🗂️ **Multi-bundle layout**: one `databricks.yml` per bundle; shared targets and variables under `bundle/`.
+- 🐍 **Shared Python package**: `polly-pony-utils` at the repo root (`src/polly_pony_utils`).
+- 🛞🛞 **Two-wheel artifact pattern** per bundle: a **platform** wheel (bundle code) plus a **utils** wheel (shared package).
+- ⚡ **Parallel workflow**: `run-databricks-bundles.sh` runs each bundle concurrently with prefixed logs.
+- 📌 **Pinned Python**: root and bundle projects use **Python 3.12.3** in their `pyproject.toml` files.
 
 ---
 
 - [What is Polly-Pony?](#what-is-polly-pony)
 - [Highlights](#highlights)
 - [Prerequisites](#prerequisites)
+- [Repository structure](#repository-structure)
 - [Configuration](#configuration)
 - [Quickstart](#quickstart)
 - [How deployments work](#how-deployments-work)
-- [Repository structure](#repository-structure)
 - [Why split bundles?](#why-split-bundles)
 - [Example bundles](#example-bundles)
 - [Artifact pattern](#artifact-pattern)
@@ -54,9 +54,31 @@ Each bundle is its own deployable unit (`bundle_a`, `bundle_b` here) with a dedi
 # Prerequisites
 
 - **[Databricks CLI](https://docs.databricks.com/en/dev-tools/cli/index.html)** installed and **authenticated** against the workspace you intend to use.
-- **Python 3.12.3** (matches `requires-python` in this repo’s `pyproject.toml` files).
+- **Python 3**
 - **[uv](https://github.com/astral-sh/uv)** (used in bundle artifact `build` steps).
 
+
+# Repository structure
+
+```text
+.
+├── run-databricks-bundles.sh       # validate / deploy / destroy all discovered bundles in parallel
+├── pyproject.toml                  # polly-pony-utils (shared package)
+├── src/polly_pony_utils/           # shared utility package source
+├── bundle/                         # shared targets + variables included by each bundle
+│   ├── targets.yml
+│   └── variables.yml
+├── bundle_a/                       # example: job bundle (seaborn visualization task)
+│   ├── databricks.yml
+│   ├── pyproject.toml
+│   ├── resources/
+│   └── src/
+└── bundle_b/                       # example: SDP medallion-style pipeline bundle
+    ├── databricks.yml
+    ├── pyproject.toml
+    ├── resources/
+    └── src/
+```
 # Configuration
 
 Before you deploy, adjust shared bundle inputs to match **your** workspace and catalog defaults.
@@ -84,16 +106,14 @@ From the repository root:
 
 # Help (lists -t/--target, -v/--validate-only, -d/--destroy-only)
 ./run-databricks-bundles.sh --help
-```
 
-**Destroy (use with care):**
-
-```bash
+# Destroy all bundles on the given target (use with care)
 # Destroys resources for ALL discovered bundles on the given target, with --auto-approve
 ./run-databricks-bundles.sh --destroy-only --target dev
 ```
 
-**Single bundle (manual):**
+**Single bundle:**
+
 
 ```bash
 cd bundle_a
@@ -120,27 +140,7 @@ When a `--target` / `-t` is passed to the script, it is forwarded to the Databri
 
 Jobs run **in parallel** (background subshells); output lines are prefixed by bundle name and color-coded. The script exits non-zero if any bundle fails, and prints a short summary of failed bundle names.
 
-# Repository structure
 
-```text
-.
-├── run-databricks-bundles.sh       # validate / deploy / destroy all discovered bundles in parallel
-├── pyproject.toml                  # polly-pony-utils (shared package)
-├── src/polly_pony_utils/           # shared utility package source
-├── bundle/                         # shared targets + variables included by each bundle
-│   ├── targets.yml
-│   └── variables.yml
-├── bundle_a/                       # example: job bundle (seaborn visualization task)
-│   ├── databricks.yml
-│   ├── pyproject.toml
-│   ├── resources/
-│   └── src/
-└── bundle_b/                       # example: SDP medallion-style pipeline bundle
-    ├── databricks.yml
-    ├── pyproject.toml
-    ├── resources/
-    └── src/
-```
 
 # Why split bundles?
 
