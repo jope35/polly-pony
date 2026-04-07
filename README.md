@@ -10,8 +10,17 @@
   <a href="https://github.com/astral-sh/uv">
     <img alt="uv" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" />
   </a>
+  <a href="https://pre-commit.com/">
+    <img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=yellow" />
+  </a>
+  <a href="https://docs.astral.sh/ruff/">
+    <img alt="Ruff" src="https://img.shields.io/badge/Ruff-%3E%3D0.15.7-563D7C?logo=ruff&logoColor=white" />
+  </a>
   <a href="https://docs.databricks.com/en/dev-tools/bundles/index.html">
     <img alt="Declarative Automation Bundles" src="https://img.shields.io/badge/Declarative%20Automation-Bundles-ff3621.svg" />
+  </a>
+  <a href="https://github.com/revodatanl/polly-pony/blob/main/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
   <a href="https://github.com/revodatanl/polly-pony/commits/main">
     <img alt="GitHub last commit (branch)" src="https://img.shields.io/github/last-commit/revodatanl/polly-pony/main" />
