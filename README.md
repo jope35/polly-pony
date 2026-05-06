@@ -30,7 +30,7 @@
 
 # What is Polly-Pony?
 
-Polly-Pony is a small, opinionated example of deploying Databricks resources through **multiple independent [Databricks Asset Bundles](https://docs.databricks.com/en/dev-tools/bundles/index.html)** (formerly known as Declarative Automation Bundles).
+Polly-Pony is a small, opinionated example of deploying Databricks resources through **multiple independent [Declarative Automation Bundles](https://docs.databricks.com/en/dev-tools/bundles/index.html)** (formerly known as Databricks Asset Bundles).
 
 Each bundle is its own deployable unit (`bundle_a`, `bundle_b` here) with a dedicated `databricks.yml`, artifact builds, and lifecycle. A root script discovers those bundles and can **validate**, **deploy**, or **destroy** them **in parallel**.
 
